@@ -9,11 +9,14 @@ function dataScraper () {
         .then(res => {
             const $ = cheerio.load(res.data);
             $('#sortable_table_Global tbody tr').each((i, elem) => {
-                const name = $(elem).find('.text--gray').html();
+                let name = $(elem).find('.text--gray').html();
                 let popInfected = $(elem).find('.text--green').html();
                 let popCured = $(elem).find('.text--blue').html();
                 let popDead = $(elem).find('.text--red').html();
 
+                if (name) {
+                    name = name.replace(/\s/g,'');
+                }
                 if (popInfected) {
                     popInfected = parseInt(popInfected.replace(/,/g, ''), 10);
                 }
@@ -23,7 +26,7 @@ function dataScraper () {
                 if (popDead) {
                     popDead = parseInt(popDead.replace(/,/g, ''), 10);
                 }
-                data[name.replace(' ', '')] = {name, popInfected, popCured, popDead}
+                data[name] = {name, popInfected, popCured, popDead}
             });
 
             return data;

@@ -18,7 +18,6 @@ const asyncMiddleware = fn =>
     };
 
 app.get('/api/PersonGrid', asyncMiddleware(async (req, res) => {
-    console.log('I was hit!');
     const data = await dataScraper();
 
     const response = {
