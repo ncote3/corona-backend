@@ -21,10 +21,7 @@ app.get('/api/PersonGrid', asyncMiddleware(async (req, res) => {
     const data = await dataScraper();
 
     const response = {
-        country: {
-            usa: data['UnitedStates'],
-            france: data['France'],
-        },
+        country: data,
     };
     res.send(response);
 }));

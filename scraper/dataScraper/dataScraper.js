@@ -3,31 +3,44 @@ function dataScraper () {
     const axios = require('axios');
     const cheerio = require('cheerio');
 
-    const scraperUrl = 'https://ncov2019.live/data';
+    const scraperUrl = 'https://www.worldometers.info/coronavirus/#countries';
     let data = {};
     return axios.get(scraperUrl)
         .then(res => {
             const $ = cheerio.load(res.data);
-            $('#sortable_table_Global tbody tr').each((i, elem) => {
-                let name = $(elem).find('.text--gray').html();
-                let popInfected = $(elem).find('.text--green').html();
-                let popCured = $(elem).find('.text--blue').html();
-                let popDead = $(elem).find('.text--red').html();
+            $('#main_table_countries_today tbody tr').each((i, elem) => {
+                const name = ($(elem).find('td .mt_a').html() !== null)
+                    ? $(elem).find('td .mt_a').html()
+                    : $(elem).find('td').eq(0).html();
 
-                if (name) {
-                    name = name.replace(/\s/g,'');
-                }
-                if (popInfected) {
-                    popInfected = parseInt(popInfected.replace(/,/g, ''), 10);
-                }
-                if (popCured) {
-                    popCured = parseInt(popCured.replace(/,/g, ''), 10);
-                }
-                if (popDead) {
-                    popDead = parseInt(popDead.replace(/,/g, ''), 10);
-                }
-                data[name] = {name, popInfected, popCured, popDead}
+                let totalCases = $(elem).find('td').eq(1).html();
+                let newCases = $(elem).find('td').eq(2).html();
+                let popDead = $(elem).find('td').eq(3).html();
+                let newDeaths = $(elem).find('td').eq(4).html();
+                let popRecovered = $(elem).find('td').eq(5).html();
+                let popInfected = $(elem).find('td').eq(6).html();
+                let seriousInfected = $(elem).find('td').eq(7).html();
+
+                if (totalCases) {totalCases = parseInt(totalCases.replace(/,/g, ''), 10)}
+                if (popDead) {popDead = parseInt(popDead.replace(/,/g, ''), 10)}
+                if (popRecovered) {popRecovered = parseInt(popRecovered.replace(/,/g, ''), 10)}
+                if (popInfected) {popInfected = parseInt(popInfected.replace(/,/g, ''), 10)}
+                if (seriousInfected) {seriousInfected = parseInt(seriousInfected.replace(/,/g, ''), 10)}
+                data[name] = {
+                    name,
+                    totalCases,
+                    newCases,
+                    popDead,
+                    newDeaths,
+                    popRecovered,
+                    popInfected,
+                    seriousInfected
+                };
             });
+            delete data['<span style="color:#00B5F0; font-style:italic; ">Diamond Princess</span>'];
+            delete data['<strong>Total:</strong>'];
+            delete data['R&#xE9;union'];
+            delete data['Cura&#xE7;ao'];
 
             return data;
         })
